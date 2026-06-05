@@ -97,7 +97,7 @@ if (!db.prepare('SELECT id FROM users WHERE email=?').get('anano@realestate.com'
 }
 
 // ── Seed on first run ─────────────────────────────────────────────────────────
-if (db.prepare('SELECT COUNT(*) AS n FROM users').get().n === 0) {
+if (!db.prepare('SELECT id FROM users WHERE email=?').get('admin@realestate.com')) {
   const adminId = uuidv4();
   const emp1Id  = uuidv4();
   const emp2Id  = uuidv4();
