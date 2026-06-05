@@ -108,7 +108,7 @@ if (!db.prepare('SELECT id FROM users WHERE email=?').get('admin@realestate.com'
 
   db.transaction(() => {
     insUser.run(adminId, 'admin@realestate.com',
-      '$2a$10$Qnw4gixAU6IbkWfjdCv60uaO2pYoe/RjmJv5NrJFbZCfZrSL/VR3u',
+      '$2a$10$I5mW4JSxppsGEG/.LKBfcOC2Qde48jTL/NXEXSrDQP3PUzLTlf7w.',
       'admin', 'ნინო', null);
     insUser.run(emp1Id, 'employee@realestate.com',
       '$2a$10$QoYp/MBapHxyA5FPwn0D6eO.8yO/ZRbZKXun8uzrlYYr9fVEfpAAO',
