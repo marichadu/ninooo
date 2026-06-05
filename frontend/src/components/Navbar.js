@@ -34,9 +34,9 @@ function Navbar({ isAuthenticated, user, onLogout, onLanguageChange }) {
   };
 
   const languages = [
-    { code: 'en', name: 'English',  label: '🇬🇧' },
-    { code: 'ka', name: 'ქართული', label: '🇬🇪' },
-    { code: 'ru', name: 'Русский',  label: '🇷🇺' },
+    { code: 'en', name: 'English',  flag: 'https://flagcdn.com/w20/gb.png' },
+    { code: 'ka', name: 'ქართული', flag: 'https://flagcdn.com/w20/ge.png' },
+    { code: 'ru', name: 'Русский',  flag: 'https://flagcdn.com/w20/ru.png' },
   ];
 
   const currentLang = languages.find(l => l.code === i18n.language) || languages[0];
@@ -66,7 +66,7 @@ function Navbar({ isAuthenticated, user, onLogout, onLanguageChange }) {
           {/* Language flag button */}
           <div className="language-dropdown" ref={langRef}>
             <button className="lang-btn" onClick={() => setLangDropdown(!langDropdown)} aria-label="Change language">
-              <span className="lang-flag">{currentLang.label}</span>
+              <img className="lang-flag" src={currentLang.flag} alt={currentLang.name} width="20" height="15" />
             </button>
             {langDropdown && (
               <div className="lang-menu">
@@ -76,7 +76,7 @@ function Navbar({ isAuthenticated, user, onLogout, onLanguageChange }) {
                     className={`lang-option ${i18n.language === lang.code ? 'active' : ''}`}
                     onClick={() => { onLanguageChange(lang.code); setLangDropdown(false); }}
                   >
-                    <span className="lang-option-flag">{lang.label}</span>
+                    <img className="lang-option-flag" src={lang.flag} alt={lang.name} width="20" height="15" />
                     <span>{lang.name}</span>
                   </button>
                 ))}
