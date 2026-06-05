@@ -29,16 +29,6 @@ function Login({ onLogin }) {
     }
   };
 
-  const handleQuickLogin = (e, creds) => {
-    e.preventDefault();
-    setEmail(creds.email);
-    setPassword(creds.password);
-    setTimeout(() => {
-      setEmail(creds.email);
-      setPassword(creds.password);
-    }, 100);
-  };
-
   return (
     <div className="login-container">
       <div className="login-box">
@@ -76,41 +66,6 @@ function Login({ onLogin }) {
           </button>
         </form>
 
-        <div className="divider">OR</div>
-
-        <div className="quick-login">
-          <p>Test Accounts:</p>
-          <button
-            className="quick-btn admin"
-            onClick={(e) =>
-              handleQuickLogin(e, {
-                email: 'admin@realestate.com',
-                password: 'Admin123!'
-              })
-            }
-          >
-            👨‍💼 Admin
-          </button>
-          <button
-            className="quick-btn employee"
-            onClick={(e) =>
-              handleQuickLogin(e, {
-                email: 'employee@realestate.com',
-                password: 'Employee123!'
-              })
-            }
-          >
-            👤 Employee
-          </button>
-        </div>
-
-        <div className="info-box">
-          <p>
-            <strong>Demo Credentials:</strong>
-          </p>
-          <p>Admin: admin@realestate.com / Admin123!</p>
-          <p>Employee: employee@realestate.com / Employee123!</p>
-        </div>
       </div>
     </div>
   );
