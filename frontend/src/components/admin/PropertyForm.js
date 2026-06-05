@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 
 const LANGS = [
   { id: 'ka', suffix: '',   flag: '🇬🇪', placeholder: 'Georgian' },
@@ -62,6 +63,12 @@ function MultiLangGroup({ label, baseName, formData, onChange, onAutofill, requi
 }
 
 function LocationSelector({ label, baseName, formData, onChange, onAutofill, required, options }) {
+  const { i18n } = useTranslation();
+  const getLabel = (o) => {
+    if (i18n.language === 'ka') return o.ka || o.en || o.ru || '';
+    if (i18n.language === 'ru') return o.ru || o.en || o.ka || '';
+    return o.en || o.ka || o.ru || '';
+  };
   const currentEn = formData[`${baseName}En`] || '';
   const isKnown = options?.some(o => o.en && o.en === currentEn);
   const hasAnyValue = formData[baseName] || formData[`${baseName}En`] || formData[`${baseName}Ru`];
@@ -83,7 +90,7 @@ function LocationSelector({ label, baseName, formData, onChange, onAutofill, req
       {options?.length > 0 && (
         <select className="location-quick-select" value={selectValue} onChange={handleSelectChange}>
           <option value="">— Choose existing —</option>
-          {options.map(o => <option key={o.en || o.ka} value={o.en || o.ka}>{o.en || o.ka}</option>)}
+          {options.map(o => <option key={o.en || o.ka} value={o.en || o.ka}>{getLabel(o)}</option>)}
           <option value="__new__">— Type new —</option>
         </select>
       )}
