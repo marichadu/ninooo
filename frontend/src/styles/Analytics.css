@@ -1,0 +1,5 @@
+.analytics-page { padding:32px 0; }
+.summary-grid { display:flex; gap:12px; flex-wrap:wrap; }
+.summary-card { background:#fff; border:1px solid #eee; padding:12px; border-radius:8px; min-width:180px; }
+.tx-table { width:100%; border-collapse:collapse; }
+.tx-table th, .tx-table td { padding:8px 10px; border-bottom:1px solid #eee; text-align:left; }

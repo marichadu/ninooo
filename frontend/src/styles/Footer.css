@@ -1,0 +1,200 @@
+.site-footer {
+  background: #f8f6f2;
+  border-top: 1px solid #ece6d6;
+  padding: 52px 0 0;
+  margin-top: 48px;
+}
+
+/* ── Main grid ── */
+.footer-inner {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 48px;
+  padding-bottom: 44px;
+}
+
+/* Brand column */
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+}
+
+.footer-tagline {
+  font-size: 14px;
+  color: #7c7156;
+  line-height: 1.65;
+  max-width: 230px;
+  margin-bottom: 20px;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 8px;
+}
+
+.footer-social-link {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid #e2ddd4;
+  background: #fff;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.footer-social-link:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 2px 8px rgba(191, 164, 90, 0.18);
+}
+
+/* Nav columns */
+.footer-col h5 {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 14px;
+}
+
+.footer-col a {
+  display: block;
+  font-size: 14px;
+  color: var(--primary);
+  margin-bottom: 9px;
+  opacity: 0.75;
+  text-decoration: none;
+  transition: opacity 0.18s, color 0.18s;
+}
+
+.footer-col a:hover {
+  opacity: 1;
+  color: var(--secondary);
+}
+
+.footer-contact-item,
+.footer-address {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-contact-item svg,
+.footer-address svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* Bottom bar */
+.footer-bottom {
+  border-top: 1px solid #ece6d6;
+  padding: 16px 0;
+  font-size: 13px;
+  color: #a09880;
+}
+
+/* ── Floating social (persistent) ── */
+.floating-social {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 2000;
+}
+
+.social-btn {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(2, 6, 23, 0.14);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.social-btn.whatsapp { background: #25d366; }
+.social-btn.telegram { background: #229ed9; }
+.social-btn.viber    { background: #7360f2; }
+
+.social-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.18);
+}
+
+.social-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Tablet (≤ 900px): 2-column grid ── */
+@media (max-width: 900px) {
+  .site-footer {
+    padding-top: 40px;
+    margin-top: 32px;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 40px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .footer-tagline {
+    max-width: none;
+  }
+}
+
+/* ── Mobile (≤ 600px): tighter ── */
+@media (max-width: 600px) {
+  .site-footer {
+    padding-top: 32px;
+    margin-top: 24px;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 28px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .footer-logo {
+    font-size: 20px;
+  }
+
+  .footer-tagline {
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  .footer-bottom {
+    font-size: 12px;
+  }
+
+  .floating-social {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .social-btn {
+    width: 40px;
+    height: 40px;
+  }
+}

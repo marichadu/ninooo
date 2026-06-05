@@ -1,0 +1,312 @@
+/* ── Hero ── */
+.about-hero {
+  background: #fff;
+  padding: 80px 0 68px;
+  text-align: center;
+  border-bottom: 1px solid rgba(15, 23, 36, 0.06);
+}
+
+.about-hero-inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.about-eyebrow {
+  display: inline-block;
+  font-family: 'Playfair Display', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--secondary);
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.about-hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+  margin: 0 0 18px;
+}
+
+.about-hero-sub {
+  font-size: 1.05rem;
+  color: #4b5563;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Philosophy ── */
+.about-philosophy {
+  background: #f8f6f2;
+  padding: 72px 0;
+}
+
+.philosophy-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.philosophy-left h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 20px;
+}
+
+.philosophy-quote {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--secondary);
+  line-height: 1.6;
+  margin: 0;
+  padding-left: 20px;
+  border-left: 3px solid var(--secondary);
+}
+
+.philosophy-right p {
+  font-size: 1rem;
+  color: #374151;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* ── Shared section title ── */
+.about-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  margin: 0 0 48px;
+}
+
+.about-section-title.light {
+  color: #fff;
+}
+
+/* ── Services ── */
+.about-services {
+  background: #fff;
+  padding: 72px 0;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.service-card {
+  padding: 32px 28px;
+  border: 1px solid rgba(15, 23, 36, 0.08);
+  border-radius: 12px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.service-card:hover {
+  box-shadow: 0 8px 28px rgba(15, 23, 36, 0.09);
+  transform: translateY(-3px);
+}
+
+.service-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: rgba(191, 164, 90, 0.1);
+  border-radius: 12px;
+  color: var(--secondary);
+  margin-bottom: 20px;
+}
+
+.service-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 10px;
+}
+
+.service-card p {
+  font-size: 0.93rem;
+  color: #4b5563;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Values ── */
+.about-values {
+  background: var(--primary);
+  padding: 72px 0;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.value-card {
+  background: var(--primary);
+  padding: 40px 36px;
+  transition: background 0.2s;
+}
+
+.value-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.value-number {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--secondary);
+  opacity: 0.7;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.value-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 10px;
+}
+
+.value-card p {
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── CTA ── */
+.about-address-section {
+  padding: 56px 0 72px;
+  background: #fff;
+}
+
+.about-address-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.18s;
+  margin-bottom: 20px;
+}
+
+.about-address-link:hover {
+  color: var(--secondary);
+}
+
+.about-map {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(15, 23, 36, 0.08);
+}
+
+.about-cta-section {
+  background: #fff;
+  padding: 72px 0;
+  border-top: 1px solid rgba(15, 23, 36, 0.06);
+}
+
+.about-cta-inner {
+  background: var(--primary);
+  border-radius: 16px;
+  padding: 48px 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-cta-inner::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(191, 164, 90, 0.08);
+  pointer-events: none;
+}
+
+.about-cta-text h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 10px;
+}
+
+.about-cta-text p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.about-cta-btns {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .philosophy-inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-cta-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 36px 28px;
+  }
+
+  .about-cta-btns {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .about-hero {
+    padding: 56px 0 48px;
+  }
+
+  .about-philosophy,
+  .about-services,
+  .about-values,
+  .about-cta-section {
+    padding: 52px 0;
+  }
+}
