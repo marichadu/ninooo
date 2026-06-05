@@ -334,7 +334,7 @@ function AdminPanel({ user }) {
     setSortOrder('newest');
   };
 
-  const [activeTab, setActiveTab] = useState('listings'); // kept for URL-edit compat
+  const [, setActiveTab] = useState('listings');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');

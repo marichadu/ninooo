@@ -84,7 +84,6 @@ function PropertyDetail() {
   const localizedCity = getPropertyField(i18n.language, property || {}, 'city', 'cityRu', 'cityEn');
   const localizedZone = getPropertyField(i18n.language, property || {}, 'zone', 'zoneRu', 'zoneEn');
   const localizedDescription = getPropertyField(i18n.language, property || {}, 'description', 'descriptionRu', 'descriptionEn');
-  const whatsappMessage = encodeURIComponent(`Hi, I am interested in: ${localizedTitle || property?.title || ''}`);
   const propertyImages = Array.from(new Set([
     ...(Array.isArray(property?.images) ? property.images : []),
     property?.image
