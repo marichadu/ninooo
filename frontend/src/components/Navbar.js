@@ -34,9 +34,9 @@ function Navbar({ isAuthenticated, user, onLogout, onLanguageChange }) {
   };
 
   const languages = [
-    { code: 'en', name: 'English',  label: 'EN' },
-    { code: 'ka', name: 'ქართული', label: 'KA' },
-    { code: 'ru', name: 'Русский',  label: 'RU' },
+    { code: 'en', name: 'English',  label: '🇬🇧' },
+    { code: 'ka', name: 'ქართული', label: '🇬🇪' },
+    { code: 'ru', name: 'Русский',  label: '🇷🇺' },
   ];
 
   const currentLang = languages.find(l => l.code === i18n.language) || languages[0];
