@@ -2,6 +2,7 @@ require('dotenv').config();
 require('./database'); // initialize SQLite and seed on first run
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const authRoutes = require('./routes/auth');
 const propertyRoutes = require('./routes/properties');
 const analyticsRoutes = require('./routes/analytics');
@@ -45,10 +46,17 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
 });
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
+// Serve React frontend in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/build')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+  });
+} else {
+  app.use((req, res) => {
+    res.status(404).json({ message: 'Route not found' });
+  });
+};
 
 // Error handler
 app.use((err, req, res, next) => {
