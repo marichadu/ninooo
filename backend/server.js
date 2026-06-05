@@ -2,6 +2,7 @@ require('dotenv').config();
 require('./database'); // initialize SQLite and seed on first run
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const path = require('path');
 const authRoutes = require('./routes/auth');
 const propertyRoutes = require('./routes/properties');
@@ -18,6 +19,7 @@ const configuredOrigins = (process.env.CLIENT_ORIGINS || '')
 const allowedOrigins = [...new Set([...defaultOrigins, ...configuredOrigins])];
 
 // Middleware
+app.use(compression());
 app.use(cors({
   origin: allowedOrigins,
   credentials: true
