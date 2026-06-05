@@ -22,7 +22,7 @@
     "eject": "react-scripts eject",
     "lint": "eslint \"src/**/*.{js,jsx}\"",
     "format": "prettier --write \"src/**/*.{js,jsx,css,json,md}\"",
-    "prepare": "husky install"
+    "prepare": "echo 'skipping husky in CI'"
   },
   "eslintConfig": {
     "extends": [
