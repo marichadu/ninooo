@@ -226,7 +226,8 @@ function AdminPanel({ user }) {
       const data = await propertyService.getAll();
       setProperties(data);
     } catch (error) {
-      setMessage(t('message.error'));
+      const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
+      setMessage(serverMsg || t('message.error'));
       console.error('Error saving property:', error);
     }
   };

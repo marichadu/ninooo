@@ -136,75 +136,80 @@ router.get('/:id', (req, res) => {
 
 // ── POST /  (create) ──────────────────────────────────────────────────────────
 router.post('/', authMiddleware, employeeOrAdmin, (req, res) => {
-  const {
-    title, titleEn, titleRu,
-    description, descriptionEn, descriptionRu,
-    city, cityEn, cityRu,
-    zone, zoneEn, zoneRu,
-    type, sqMeters, bedrooms, bathrooms, floor,
-    price, pricePerSqm, priceNote, currency,
-    image, images, videoUrl,
-    listingRef, category,
-    source, externalId,
-  } = req.body;
+  try {
+    const {
+      title, titleEn, titleRu,
+      description, descriptionEn, descriptionRu,
+      city, cityEn, cityRu,
+      zone, zoneEn, zoneRu,
+      type, sqMeters, bedrooms, bathrooms, floor,
+      price, pricePerSqm, priceNote, currency,
+      image, images, videoUrl,
+      listingRef, category,
+      source, externalId,
+    } = req.body;
 
-  const hasPrivatePrice  = Boolean(priceNote?.trim());
-  const hasPublicPrice   = price !== undefined && price !== null && price !== '';
-  const hasPricePerSqm   = pricePerSqm !== undefined && pricePerSqm !== null && pricePerSqm !== '' && Number(pricePerSqm) > 0;
+    const hasPrivatePrice  = Boolean(priceNote?.trim());
+    const hasPublicPrice   = price !== undefined && price !== null && price !== '';
+    const hasPricePerSqm   = pricePerSqm !== undefined && pricePerSqm !== null && pricePerSqm !== '' && Number(pricePerSqm) > 0;
 
-  if (!title || !titleEn || !titleRu || !city || !type || (!hasPrivatePrice && !hasPublicPrice && !hasPricePerSqm)) {
-    return res.status(400).json({ message: 'Missing required fields' });
+    if (!title || !titleEn || !titleRu || !city || !type || (!hasPrivatePrice && !hasPublicPrice && !hasPricePerSqm)) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    const imagesArr = normalizeImages({ image, images });
+    const p = {
+      id:            uuidv4(),
+      title,         titleEn,       titleRu,
+      description:   description    || '',
+      descriptionEn: descriptionEn  || '',
+      descriptionRu: descriptionRu  || '',
+      city,
+      cityEn:        cityEn         || '',
+      cityRu:        cityRu         || '',
+      zone:          zone           || '',
+      zoneEn:        zoneEn         || '',
+      zoneRu:        zoneRu         || '',
+      type,
+      sqMeters:      parsePropertyNumber(sqMeters),
+      bedrooms:      parsePropertyNumber(bedrooms),
+      bathrooms:     parsePropertyNumber(bathrooms),
+      floor:         parsePropertyNumber(floor),
+      price:         hasPrivatePrice ? 0 : parsePropertyNumber(price),
+      pricePerSqm:   hasPrivatePrice ? 0 : parsePropertyNumber(pricePerSqm),
+      priceNote:     hasPrivatePrice ? priceNote.trim() : '',
+      currency:      currency  || 'USD',
+      image:         image || imagesArr[0] || '',
+      images:        JSON.stringify(imagesArr),
+      videoUrl:      videoUrl  || '',
+      listingRef:    listingRef ? String(listingRef).trim() : '',
+      category:      ALLOWED_CATEGORIES.has(category) ? category : 'residential',
+      source:        source    || 'manual',
+      externalId:    externalId || null,
+      status:        'active',
+      createdAt:     new Date().toISOString(),
+      createdBy:     req.user.id,
+    };
+
+    db.prepare(`
+      INSERT INTO properties (
+        id, title, titleEn, titleRu, description, descriptionEn, descriptionRu,
+        city, cityEn, cityRu, zone, zoneEn, zoneRu, type, sqMeters, bedrooms,
+        bathrooms, floor, price, pricePerSqm, priceNote, currency, image, images,
+        videoUrl, listingRef, category, source, externalId, status, createdAt, createdBy
+      ) VALUES (
+        @id, @title, @titleEn, @titleRu, @description, @descriptionEn, @descriptionRu,
+        @city, @cityEn, @cityRu, @zone, @zoneEn, @zoneRu, @type, @sqMeters, @bedrooms,
+        @bathrooms, @floor, @price, @pricePerSqm, @priceNote, @currency, @image, @images,
+        @videoUrl, @listingRef, @category, @source, @externalId, @status, @createdAt, @createdBy
+      )
+    `).run(p);
+
+    res.status(201).json(toPropertyResponse({ ...p, images: imagesArr }));
+  } catch (err) {
+    console.error('POST /properties error:', err.message);
+    res.status(500).json({ message: err.message });
   }
-
-  const imagesArr = normalizeImages({ image, images });
-  const p = {
-    id:            uuidv4(),
-    title,         titleEn,       titleRu,
-    description:   description    || '',
-    descriptionEn: descriptionEn  || '',
-    descriptionRu: descriptionRu  || '',
-    city,
-    cityEn:        cityEn         || '',
-    cityRu:        cityRu         || '',
-    zone:          zone           || '',
-    zoneEn:        zoneEn         || '',
-    zoneRu:        zoneRu         || '',
-    type,
-    sqMeters:      parsePropertyNumber(sqMeters),
-    bedrooms:      parsePropertyNumber(bedrooms),
-    bathrooms:     parsePropertyNumber(bathrooms),
-    floor:         parsePropertyNumber(floor),
-    price:         hasPrivatePrice ? 0 : parsePropertyNumber(price),
-    pricePerSqm:   hasPrivatePrice ? 0 : parsePropertyNumber(pricePerSqm),
-    priceNote:     hasPrivatePrice ? priceNote.trim() : '',
-    currency:      currency  || 'USD',
-    image:         image || imagesArr[0] || '',
-    images:        JSON.stringify(imagesArr),
-    videoUrl:      videoUrl  || '',
-    listingRef:    listingRef ? String(listingRef).trim() : '',
-    category:      ALLOWED_CATEGORIES.has(category) ? category : 'residential',
-    source:        source    || 'manual',
-    externalId:    externalId || null,
-    status:        'active',
-    createdAt:     new Date().toISOString(),
-    createdBy:     req.user.id,
-  };
-
-  db.prepare(`
-    INSERT INTO properties (
-      id, title, titleEn, titleRu, description, descriptionEn, descriptionRu,
-      city, cityEn, cityRu, zone, zoneEn, zoneRu, type, sqMeters, bedrooms,
-      bathrooms, floor, price, pricePerSqm, priceNote, currency, image, images,
-      videoUrl, listingRef, category, source, externalId, status, createdAt, createdBy
-    ) VALUES (
-      @id, @title, @titleEn, @titleRu, @description, @descriptionEn, @descriptionRu,
-      @city, @cityEn, @cityRu, @zone, @zoneEn, @zoneRu, @type, @sqMeters, @bedrooms,
-      @bathrooms, @floor, @price, @pricePerSqm, @priceNote, @currency, @image, @images,
-      @videoUrl, @listingRef, @category, @source, @externalId, @status, @createdAt, @createdBy
-    )
-  `).run(p);
-
-  res.status(201).json(toPropertyResponse({ ...p, images: imagesArr }));
 });
 
 // ── POST /import  (bulk upsert) ───────────────────────────────────────────────
