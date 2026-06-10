@@ -222,6 +222,7 @@ router.post('/', authMiddleware, employeeOrAdmin, (req, res) => {
 
 // ── POST /import  (bulk upsert) ───────────────────────────────────────────────
 router.post('/import', authMiddleware, employeeOrAdmin, async (req, res) => {
+  try {
   const { listings = [], source = 'facebook' } = req.body;
   if (!Array.isArray(listings)) return res.status(400).json({ message: 'listings must be an array' });
 
@@ -321,6 +322,10 @@ router.post('/import', authMiddleware, employeeOrAdmin, async (req, res) => {
   })();
 
   res.status(201).json({ message: 'Import completed', ...results });
+  } catch (err) {
+    console.error('POST /properties/import error:', err.message);
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // ── PUT /:id  (update) ────────────────────────────────────────────────────────

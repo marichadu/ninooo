@@ -6,10 +6,12 @@ const fs    = require('fs');
 const path  = require('path');
 const crypto = require('crypto');
 
-const UPLOADS_DIR = path.join(__dirname, '../uploads');
+const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(__dirname, '../uploads');
 
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+try {
+  if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+} catch (e) {
+  console.warn('uploads dir not writable, image caching disabled:', e.message);
 }
 
 function downloadImage(sourceUrl) {
@@ -59,7 +61,8 @@ function downloadImage(sourceUrl) {
 
         const filename = `${hash}${ext}`;
         const filepath = path.join(UPLOADS_DIR, filename);
-        const file = fs.createWriteStream(filepath);
+        let file;
+        try { file = fs.createWriteStream(filepath); } catch (err) { return reject(err); }
 
         res.pipe(file);
         file.on('finish', () => file.close(() => resolve(`/uploads/${filename}`)));
