@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { propertyService, authService } from '../services/api';
-import { FALLBACK_PROPERTY_IMAGE, renderPrice } from '../utils/propertyDisplay';
+import { FALLBACK_PROPERTY_IMAGE, renderPrice, safeImageSrc } from '../utils/propertyDisplay';
 import '../styles/PropertyDetail.css';
 
 const getLocalizedValue = (language, geValue, ruValue, enValue) => {
@@ -87,7 +87,7 @@ function PropertyDetail() {
   const propertyImages = Array.from(new Set([
     ...(Array.isArray(property?.images) ? property.images : []),
     property?.image
-  ].filter(src => src && src !== FALLBACK_PROPERTY_IMAGE)));
+  ].filter(src => src && src !== FALLBACK_PROPERTY_IMAGE))).map(safeImageSrc);
   const videoUrlList = (() => {
     const raw = property?.videoUrl || '';
     if (!raw) return [];
@@ -163,7 +163,7 @@ function PropertyDetail() {
             {propertyImages.length > 0 && (
               <div className="detail-image">
                 <img
-                  src={property.image || FALLBACK_PROPERTY_IMAGE}
+                  src={safeImageSrc(property.image)}
                   alt={property.title}
                   style={{ cursor: 'pointer' }}
                   onClick={() => setLightboxIndex(0)}

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { propertyService } from '../services/api';
-import { FALLBACK_PROPERTY_IMAGE, renderPrice, sortByNewest } from '../utils/propertyDisplay';
+import { FALLBACK_PROPERTY_IMAGE, renderPrice, sortByNewest, safeImageSrc } from '../utils/propertyDisplay';
 import '../styles/Home.css';
 
 const IconHome = () => (
@@ -196,7 +196,7 @@ function Home() {
               <article className="featured-card" key={property.id}>
                 <div className="featured-image-wrap">
                   <img
-                    src={property.image || FALLBACK_PROPERTY_IMAGE}
+                    src={safeImageSrc(property.image)}
                     alt={resolveLocaleValue(property, 'title', 'titleEn', 'titleRu')}
                     onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = FALLBACK_PROPERTY_IMAGE; }}
                   />

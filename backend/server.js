@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const propertyRoutes = require('./routes/properties');
 const analyticsRoutes = require('./routes/analytics');
 const contactRoutes = require('./routes/contact');
+const { downloadImage, UPLOADS_DIR } = require('./utils/imageDownload');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -34,6 +35,29 @@ app.use((req, res, next) => {
   if (process.env.NODE_ENV !== 'production') {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   }
+  next();
+});
+
+// Serve uploaded/cached images permanently
+app.use('/uploads', express.static(UPLOADS_DIR, { maxAge: '365d' }));
+
+// Image proxy — downloads external images (e.g. Facebook CDN) to local storage
+// GET /api/image-proxy?url=<encoded-image-url>
+app.get('/api/image-proxy', async (req, res) => {
+  const { url } = req.query;
+  if (!url || !url.startsWith('http')) return res.status(400).end();
+  try {
+    const localPath = await downloadImage(url);
+    return res.redirect(301, localPath);
+  } catch {
+    // Could not download — redirect to fallback
+    return res.redirect(302, 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?auto=format&fit=crop&w=800&q=60');
+  }
+});
+
+// Prevent browser from caching API responses (avoids ERR_CACHE_WRITE_FAILURE)
+app.use('/api', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
   next();
 });
 

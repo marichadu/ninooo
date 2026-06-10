@@ -1,5 +1,12 @@
 export const FALLBACK_PROPERTY_IMAGE = 'https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?auto=format&fit=crop&w=1200&q=80';
 
+export const safeImageSrc = (url) => {
+  if (!url) return FALLBACK_PROPERTY_IMAGE;
+  if (url.startsWith('/uploads/') || url.startsWith('data:')) return url;
+  if (url.includes('fbcdn.net')) return `/api/image-proxy?url=${encodeURIComponent(url)}`;
+  return url;
+};
+
 const currencySymbol = (currency) => {
   if (currency === 'USD') return '$';
   if (currency === 'GEL') return '₾';

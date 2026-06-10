@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { propertyService, authService } from '../services/api';
-import { FALLBACK_PROPERTY_IMAGE, renderPrice } from '../utils/propertyDisplay';
+import { FALLBACK_PROPERTY_IMAGE, renderPrice, safeImageSrc } from '../utils/propertyDisplay';
 import '../styles/Properties.css';
 
 const IconSearch = () => (
@@ -47,6 +47,7 @@ function Properties() {
   const [zones, setZones] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState(() => parseFiltersFromSearch(location.search));
+  const [keywordInput, setKeywordInput] = useState(() => parseFiltersFromSearch(location.search).keyword);
 
   const resolveLocaleValue = (valueSet, geKey, enKey, ruKey) => {
     if (i18n.language === 'ka') return valueSet[geKey] || valueSet[enKey] || valueSet[ruKey] || '';
@@ -64,6 +65,13 @@ function Properties() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFilters(prev => ({ ...prev, keyword: keywordInput }));
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [keywordInput]);
 
   useEffect(() => {
     (async () => {
@@ -93,15 +101,23 @@ function Properties() {
 
   useEffect(() => {
     const next = parseFiltersFromSearch(location.search);
-    if (Object.values(next).some(Boolean)) setFilters(next);
+    if (Object.values(next).some(Boolean)) {
+      setFilters(next);
+      setKeywordInput(next.keyword || '');
+    }
   }, [location.search]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value, ...(name === 'city' ? { zone: '' } : {}) }));
+    if (name === 'keyword') {
+      setKeywordInput(value);
+    } else {
+      setFilters(prev => ({ ...prev, [name]: value, ...(name === 'city' ? { zone: '' } : {}) }));
+    }
   };
 
   const handleClearFilters = () => {
+    setKeywordInput('');
     setFilters({ keyword: '', city: '', zone: '', type: '', category: '', minPrice: '', maxPrice: '', minSqMeters: '', maxSqMeters: '' });
   };
 
@@ -266,7 +282,7 @@ function Properties() {
                     <article key={property.id} className="property-card property-card--row">
                       <div className="property-image">
                         <img
-                          src={property.image || FALLBACK_PROPERTY_IMAGE}
+                          src={safeImageSrc(property.image)}
                           alt={resolveLocaleValue(property, 'title', 'titleEn', 'titleRu')}
                           onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = FALLBACK_PROPERTY_IMAGE; }}
                         />

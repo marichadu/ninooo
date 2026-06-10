@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { FALLBACK_PROPERTY_IMAGE } from '../../utils/propertyDisplay';
+import { safeImageSrc } from '../../utils/propertyDisplay';
 
 const STATUS_OPTIONS = ['active', 'sold', 'rented', 'disabled'];
 const STATUS_I18N_KEY = { active: 'admin.statusActive', sold: 'admin.statusSold', rented: 'admin.statusRented', disabled: 'admin.statusDisabled' };
@@ -119,10 +119,9 @@ function ListingsTable({
               <tr key={property.id}>
                 <td>
                   <img
-                    src={property.image || FALLBACK_PROPERTY_IMAGE}
+                    src={safeImageSrc(property.image)}
                     alt=""
                     className="listing-thumb"
-                    onError={e => { e.target.src = FALLBACK_PROPERTY_IMAGE; }}
                   />
                 </td>
                 <td className="listing-ref">{property.listingRef || '—'}</td>

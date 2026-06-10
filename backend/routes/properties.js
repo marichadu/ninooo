@@ -9,6 +9,14 @@ const {
   toPropertyResponse,
   parsePropertyNumber,
 } = require('../utils/property');
+const { downloadImage } = require('../utils/imageDownload');
+
+async function localizeImages(images) {
+  return Promise.all(images.map(async (src) => {
+    if (!src || !src.startsWith('http')) return src;
+    try { return await downloadImage(src); } catch { return src; }
+  }));
+}
 
 const router = express.Router();
 
@@ -213,14 +221,21 @@ router.post('/', authMiddleware, employeeOrAdmin, (req, res) => {
 });
 
 // ── POST /import  (bulk upsert) ───────────────────────────────────────────────
-router.post('/import', authMiddleware, employeeOrAdmin, (req, res) => {
+router.post('/import', authMiddleware, employeeOrAdmin, async (req, res) => {
   const { listings = [], source = 'facebook' } = req.body;
   if (!Array.isArray(listings)) return res.status(400).json({ message: 'listings must be an array' });
+
+  // Download all external images first so they're stored permanently
+  const localizedListings = await Promise.all(listings.map(async (listing) => {
+    const raw = normalizeImages(listing);
+    const local = await localizeImages(raw);
+    return { ...listing, images: local, image: local[0] || listing.image || '' };
+  }));
 
   const results = { created: 0, updated: 0, skipped: 0 };
 
   db.transaction(() => {
-    listings.forEach(listing => {
+    localizedListings.forEach(listing => {
       if (!listing.title && !listing.titleEn && !listing.titleRu) { results.skipped += 1; return; }
 
       const externalId = listing.externalId || listing.id || null;
