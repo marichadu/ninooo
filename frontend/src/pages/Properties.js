@@ -238,16 +238,16 @@ function Properties() {
                 <input
                   type="text"
                   name="keyword"
-                  value={filters.keyword}
+                  value={keywordInput}
                   onChange={handleFilterChange}
                   placeholder={t('properties.search')}
                   className="properties-keyword-input"
                 />
-                {filters.keyword && (
+                {keywordInput && (
                   <button
                     type="button"
                     className="search-clear-btn"
-                    onClick={() => setFilters(prev => ({ ...prev, keyword: '' }))}
+                    onClick={() => { setKeywordInput(''); setFilters(prev => ({ ...prev, keyword: '' })); }}
                     aria-label="Clear search"
                   >
                     <IconClose />
@@ -284,6 +284,7 @@ function Properties() {
                         <img
                           src={safeImageSrc(property.image)}
                           alt={resolveLocaleValue(property, 'title', 'titleEn', 'titleRu')}
+                          loading="lazy"
                           onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = FALLBACK_PROPERTY_IMAGE; }}
                         />
                         <div className="property-badge">

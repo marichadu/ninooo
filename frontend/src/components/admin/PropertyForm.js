@@ -286,13 +286,13 @@ function PropertyForm({
 
       <div className="form-group form-group-full pform-video">
         <label>Video URLs</label>
-        {(videoUrls || ['']).map((url, i) => (
+        {(videoUrls || []).map((url, i) => (
           <div key={i} className="pform-video-row">
             <input
               type="url"
               value={url}
               onChange={e => {
-                const next = [...(videoUrls || [''])];
+                const next = [...(videoUrls || [])];
                 next[i] = e.target.value;
                 onVideoUrlsChange(next);
               }}
@@ -301,15 +301,15 @@ function PropertyForm({
             <button
               type="button"
               className="btn btn-secondary pform-video-remove"
-              onClick={() => onVideoUrlsChange((videoUrls || ['']).filter((_, j) => j !== i))}
-              disabled={(videoUrls || ['']).length === 1}
+              onClick={() => onVideoUrlsChange((videoUrls || []).filter((_, j) => j !== i))}
+              disabled={(videoUrls || []).length === 1}
             >×</button>
           </div>
         ))}
         <button
           type="button"
           className="btn btn-secondary pform-video-add"
-          onClick={() => onVideoUrlsChange([...(videoUrls || ['']), ''])}
+          onClick={() => onVideoUrlsChange([...(videoUrls || []), ''])}
         >+ Add another video</button>
         <small className="field-hint" style={{ marginTop: 6, display: 'block' }}>Paste public Facebook video URLs to show next to the photos.</small>
       </div>

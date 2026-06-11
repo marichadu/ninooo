@@ -42,7 +42,7 @@ function AdminPanel({ user }) {
     isPricePrivate: false,
     currency: 'USD',
     image: '',
-    videoUrls: [''],
+    videoUrls: [],
     listingRef: '',
     category: 'residential',
   });
@@ -53,7 +53,7 @@ function AdminPanel({ user }) {
     (async () => {
       try {
         setLoading(true);
-        const propertyData = await propertyService.getAll();
+        const propertyData = await propertyService.getAll({ status: 'all' });
         setProperties(propertyData);
       } catch (error) {
         console.error('Error fetching admin data:', error);
@@ -163,7 +163,7 @@ function AdminPanel({ user }) {
   }, [properties, formData.cityEn]);
 
   const parseVideoUrls = (v) => {
-    if (!v) return [''];
+    if (!v) return [];
     try { const a = JSON.parse(v); if (Array.isArray(a) && a.length) return a; } catch {}
     return [v];
   };
@@ -317,7 +317,7 @@ function AdminPanel({ user }) {
       isPricePrivate: false,
       currency: 'USD',
       image: '',
-      videoUrls: [''],
+      videoUrls: [],
       listingRef: '',
       category: 'residential',
     });

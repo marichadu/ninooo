@@ -74,6 +74,7 @@ export const propertyService = {
     if (filters.maxSqMeters) params.append('maxSqMeters', filters.maxSqMeters);
     if (filters.minPrice) params.append('minPrice', filters.minPrice);
     if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
+    if (filters.status) params.append('status', filters.status);
 
     const response = await api.get(`/properties?${params.toString()}`);
     return response.data;

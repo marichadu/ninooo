@@ -75,6 +75,10 @@ db.exec(`
   );
 `);
 
+// ── Indexes ───────────────────────────────────────────────────────────────────
+try { db.exec('CREATE INDEX IF NOT EXISTS idx_properties_status ON properties(status)'); } catch {}
+try { db.exec('CREATE INDEX IF NOT EXISTS idx_properties_status_created ON properties(status, createdAt DESC)'); } catch {}
+
 // ── Migrations ───────────────────────────────────────────────────────────────
 try { db.exec('ALTER TABLE properties ADD COLUMN pricePerSqm REAL DEFAULT 0'); } catch {}
 try { db.exec('ALTER TABLE properties ADD COLUMN featured INTEGER DEFAULT 0'); } catch {}

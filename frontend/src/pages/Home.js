@@ -198,6 +198,7 @@ function Home() {
                   <img
                     src={safeImageSrc(property.image)}
                     alt={resolveLocaleValue(property, 'title', 'titleEn', 'titleRu')}
+                    loading="lazy"
                     onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = FALLBACK_PROPERTY_IMAGE; }}
                   />
                   <span className="featured-badge">

@@ -72,10 +72,17 @@ function sanitizeUpdates(body) {
 
 // ── GET /  (filtered list) ────────────────────────────────────────────────────
 router.get('/', (req, res) => {
-  const { keyword, city, zone, type, category, minSqMeters, maxSqMeters, minPrice, maxPrice } = req.query;
+  const { keyword, city, zone, type, category, minSqMeters, maxSqMeters, minPrice, maxPrice, status } = req.query;
 
   const conditions = [];
   const params = [];
+
+  if (status === 'all') {
+    // no status filter — used by admin to see all listings
+  } else {
+    conditions.push('status=?');
+    params.push(status || 'active');
+  }
 
   if (keyword) {
     const kw = `%${keyword.toLowerCase()}%`;
