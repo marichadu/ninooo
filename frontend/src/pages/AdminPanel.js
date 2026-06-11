@@ -9,6 +9,8 @@ import '../styles/AdminPanel.css';
 
 /* global globalThis */
 
+const STATUS_ORDER = { active: 0, rented: 1, sold: 2, disabled: 3 };
+
 function AdminPanel({ user }) {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
@@ -374,7 +376,6 @@ function AdminPanel({ user }) {
     return Array.from(map.values()).sort((a, b) => a.en.localeCompare(b.en));
   }, [properties, cityFilter]);
 
-  const STATUS_ORDER = { active: 0, rented: 1, sold: 2, disabled: 3 };
   const myListings = useMemo(() => properties
     .filter(p =>
       (statusFilter === 'all' || p.status === statusFilter) &&
