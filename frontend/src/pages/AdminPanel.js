@@ -351,6 +351,9 @@ function AdminPanel({ user }) {
   const [sortOrder, setSortOrder] = useState('newest');
   const [refSearch, setRefSearch] = useState('');
   const [titleSearch, setTitleSearch] = useState('');
+  const [listPage, setListPage] = useState(1);
+
+  useEffect(() => { setListPage(1); }, [statusFilter, typeFilter, categoryFilter, cityFilter, zoneFilter, sortOrder, refSearch, titleSearch]);
 
   const filterCities = useMemo(() => {
     const map = new Map();
@@ -525,6 +528,8 @@ function AdminPanel({ user }) {
             onAddListing={() => { resetForm(); setEditingId(null); setShowForm(true); }}
             onDelete={handleDelete}
             onMarkStatus={handleMarkStatus}
+            page={listPage}
+            onPageChange={setListPage}
           />
         </div>
 

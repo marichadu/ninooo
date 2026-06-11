@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { safeImageSrc } from '../../utils/propertyDisplay';
@@ -18,10 +18,9 @@ function ListingsTable({
   sortOrder, onSortOrder,
   refSearch, onRefSearch,
   titleSearch, onTitleSearch,
+  page, onPageChange,
 }) {
-  const [page, setPage] = useState(1);
-
-  useEffect(() => { setPage(1); }, [statusFilter, typeFilter, cityFilter, zoneFilter, sortOrder, refSearch, listings.length]);
+  const setPage = onPageChange;
 
   const totalPages = Math.max(1, Math.ceil(listings.length / PAGE_SIZE));
   const paged = listings.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
