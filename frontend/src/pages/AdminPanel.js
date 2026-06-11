@@ -164,7 +164,8 @@ function AdminPanel({ user }) {
 
   const parseVideoUrls = (v) => {
     if (!v) return [];
-    try { const a = JSON.parse(v); if (Array.isArray(a) && a.length) return a; } catch {}
+    try { const a = JSON.parse(v); if (Array.isArray(a)) return a; } catch {}
+    if (v.trim() === '[]') return [];
     return [v];
   };
 
