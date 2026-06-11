@@ -427,53 +427,11 @@ function AdminPanel({ user }) {
     if (editHandledRef.current || properties.length === 0) return;
     const editId = searchParams.get('edit');
     if (!editId) return;
-    const property = properties.find(p => p.id === editId);
-    if (!property) return;
-
     editHandledRef.current = true;
-    let existingImages = [];
-    if (Array.isArray(property.images) && property.images.length > 0) {
-      existingImages = property.images;
-    } else if (property.image) {
-      existingImages = [property.image];
-    }
-    setFormData({
-      title: property.title,
-      titleEn: property.titleEn,
-      titleRu: property.titleRu,
-      description: property.description,
-      descriptionEn: property.descriptionEn,
-      descriptionRu: property.descriptionRu,
-      city: property.city,
-      cityEn: property.cityEn,
-      cityRu: property.cityRu,
-      zone: property.zone,
-      zoneEn: property.zoneEn,
-      zoneRu: property.zoneRu,
-      type: property.type,
-      sqMeters: property.sqMeters,
-      bedrooms: property.bedrooms,
-      bathrooms: property.bathrooms,
-      floor: property.floor,
-      price: property.pricePerSqm > 0 ? '' : (property.price || ''),
-      pricePerSqm: property.pricePerSqm || '',
-      priceNote: property.priceNote || '',
-      isPricePrivate: Boolean(property.priceNote),
-      currency: property.currency,
-      image: property.image,
-      videoUrls: parseVideoUrls(property.videoUrl),
-      listingRef: property.listingRef || '',
-      category: property.category || 'residential',
-    });
-    setPhotoItems(existingImages.map((src, index) => ({
-      id: `${property.id}-${index}`,
-      src,
-      name: `photo-${index + 1}`
-    })));
-    setEditingId(property.id);
-    setShowForm(true);
-    setActiveTab('listings');
-  }, [properties]); // eslint-disable-line react-hooks/exhaustive-deps
+    handleEdit({ id: editId, images: [], image: '' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [properties, searchParams]);
+
 
   return (
     <div className="admin-container">
