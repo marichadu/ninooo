@@ -102,9 +102,10 @@ router.get('/', (req, res) => {
   if (minPrice)    { conditions.push('price>=?');     params.push(parsePropertyNumber(minPrice)); }
   if (maxPrice)    { conditions.push('price<=?');     params.push(parsePropertyNumber(maxPrice, Number.MAX_SAFE_INTEGER)); }
 
-  const cols = `id,title,titleEn,titleRu,city,cityEn,cityRu,zone,zoneEn,zoneRu,
+  const cols = `id,title,titleEn,titleRu,description,descriptionEn,descriptionRu,
+    city,cityEn,cityRu,zone,zoneEn,zoneRu,
     type,sqMeters,bedrooms,bathrooms,floor,price,pricePerSqm,priceNote,currency,
-    image,videoUrl,status,featured,listingRef,category,source,
+    image,videoUrl,status,featured,listingRef,category,source,externalId,
     createdAt,createdBy,updatedAt,soldBy,soldAt,rentedBy,rentedAt`;
   const sql = `SELECT ${cols} FROM properties${conditions.length ? ' WHERE ' + conditions.join(' AND ') : ''}`;
   const rows = db.prepare(sql).all(...params);
