@@ -342,7 +342,6 @@ function AdminPanel({ user }) {
     setSortOrder('newest');
   };
 
-  const [, setActiveTab] = useState('listings');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
