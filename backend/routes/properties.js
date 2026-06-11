@@ -102,9 +102,13 @@ router.get('/', (req, res) => {
   if (minPrice)    { conditions.push('price>=?');     params.push(parsePropertyNumber(minPrice)); }
   if (maxPrice)    { conditions.push('price<=?');     params.push(parsePropertyNumber(maxPrice, Number.MAX_SAFE_INTEGER)); }
 
-  const sql = `SELECT * FROM properties${conditions.length ? ' WHERE ' + conditions.join(' AND ') : ''}`;
+  const cols = `id,title,titleEn,titleRu,city,cityEn,cityRu,zone,zoneEn,zoneRu,
+    type,sqMeters,bedrooms,bathrooms,floor,price,pricePerSqm,priceNote,currency,
+    image,videoUrl,status,featured,listingRef,category,source,
+    createdAt,createdBy,updatedAt,soldBy,soldAt,rentedBy,rentedAt`;
+  const sql = `SELECT ${cols} FROM properties${conditions.length ? ' WHERE ' + conditions.join(' AND ') : ''}`;
   const rows = db.prepare(sql).all(...params);
-  res.json(rows.map(rowToProperty).map(toPropertyResponse));
+  res.json(rows.map(r => ({ ...rowToProperty({ ...r, images: '[]' }), images: [] })).map(toPropertyResponse));
 });
 
 // ── GET /cities ───────────────────────────────────────────────────────────────

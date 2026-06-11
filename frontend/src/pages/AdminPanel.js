@@ -233,13 +233,10 @@ function AdminPanel({ user }) {
     }
   };
 
-  const handleEdit = (property) => {
-    let existingImages = [];
-    if (Array.isArray(property.images) && property.images.length > 0) {
-      existingImages = property.images;
-    } else if (property.image) {
-      existingImages = [property.image];
-    }
+  const populateEditForm = (property) => {
+    const existingImages = Array.isArray(property.images) && property.images.length > 0
+      ? property.images
+      : (property.image ? [property.image] : []);
 
     setFormData({
       title: property.title,
@@ -276,6 +273,15 @@ function AdminPanel({ user }) {
     })));
     setEditingId(property.id);
     setShowForm(true);
+  };
+
+  const handleEdit = async (property) => {
+    try {
+      const full = await propertyService.getById(property.id);
+      populateEditForm(full);
+    } catch {
+      populateEditForm(property);
+    }
   };
 
   const handleDelete = async (id) => {
