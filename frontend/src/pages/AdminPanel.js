@@ -53,8 +53,8 @@ function AdminPanel({ user }) {
     (async () => {
       try {
         setLoading(true);
-        const propertyData = await propertyService.getAll({ status: 'all' });
-        setProperties(propertyData);
+        const result = await propertyService.getAll({ status: 'all', limit: 500 });
+        setProperties(result.properties || []);
       } catch (error) {
         console.error('Error fetching admin data:', error);
         setMessage(t('message.error'));
@@ -224,8 +224,8 @@ function AdminPanel({ user }) {
       setEditingId(null);
       setFormError('');
       resetForm();
-      const data = await propertyService.getAll();
-      setProperties(data);
+      const result = await propertyService.getAll({ status: 'all', limit: 500 });
+      setProperties(result.properties || []);
     } catch (error) {
       const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
       setMessage(serverMsg || t('message.error'));
@@ -292,8 +292,8 @@ function AdminPanel({ user }) {
     try {
       await propertyService.delete(id);
       setMessage(t('message.deleteSuccess'));
-      const data = await propertyService.getAll();
-      setProperties(data);
+      const result = await propertyService.getAll({ status: 'all', limit: 500 });
+      setProperties(result.properties || []);
     } catch (error) {
       setMessage(error?.response?.data?.message || error?.message || t('message.error'));
     }
@@ -375,7 +375,7 @@ function AdminPanel({ user }) {
   }, [properties, cityFilter]);
 
   const STATUS_ORDER = { active: 0, rented: 1, sold: 2, disabled: 3 };
-  const myListings = properties
+  const myListings = useMemo(() => properties
     .filter(p =>
       (statusFilter === 'all' || p.status === statusFilter) &&
       (typeFilter === 'all' || p.type === typeFilter) &&
@@ -397,12 +397,14 @@ function AdminPanel({ user }) {
       if (sortOrder === 'title-desc') return (b.title || b.titleEn || '').localeCompare(a.title || a.titleEn || '');
       if (sortOrder === 'status') return (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9);
       return 0;
-    });
+    }),
+  [properties, statusFilter, typeFilter, categoryFilter, cityFilter, zoneFilter, refSearch, titleSearch, sortOrder]);
+
   const handleMarkStatus = async (id, status) => {
     try {
       await propertyService.update(id, { status });
-      const data = await propertyService.getAll();
-      setProperties(data);
+      const result = await propertyService.getAll({ status: 'all', limit: 500 });
+      setProperties(result.properties || []);
     } catch (error) {
       setMessage(error?.response?.data?.message || error?.message || t('message.error'));
     }
@@ -411,8 +413,8 @@ function AdminPanel({ user }) {
   const handleToggleFeatured = async (id, featured) => {
     try {
       await propertyService.update(id, { featured });
-      const data = await propertyService.getAll();
-      setProperties(data);
+      const result = await propertyService.getAll({ status: 'all', limit: 500 });
+      setProperties(result.properties || []);
     } catch (error) {
       setMessage(error?.response?.data?.message || error?.message || t('message.error'));
     }

@@ -72,7 +72,11 @@ function sanitizeUpdates(body) {
 
 // ── GET /  (filtered list) ────────────────────────────────────────────────────
 router.get('/', (req, res) => {
-  const { keyword, city, zone, type, category, minSqMeters, maxSqMeters, minPrice, maxPrice, status } = req.query;
+  const { keyword, city, zone, type, category, minSqMeters, maxSqMeters, minPrice, maxPrice, status, page, limit } = req.query;
+
+  const pageNum  = Math.max(1, parseInt(page)  || 1);
+  const limitNum = Math.min(500, Math.max(1, parseInt(limit) || 20));
+  const offset   = (pageNum - 1) * limitNum;
 
   const conditions = [];
   const params = [];
@@ -102,14 +106,24 @@ router.get('/', (req, res) => {
   if (minPrice)    { conditions.push('price>=?');     params.push(parsePropertyNumber(minPrice)); }
   if (maxPrice)    { conditions.push('price<=?');     params.push(parsePropertyNumber(maxPrice, Number.MAX_SAFE_INTEGER)); }
 
+  const where = conditions.length ? ' WHERE ' + conditions.join(' AND ') : '';
+  const { total } = db.prepare(`SELECT COUNT(*) as total FROM properties${where}`).get(...params);
+
   const cols = `id,title,titleEn,titleRu,description,descriptionEn,descriptionRu,
     city,cityEn,cityRu,zone,zoneEn,zoneRu,
     type,sqMeters,bedrooms,bathrooms,floor,price,pricePerSqm,priceNote,currency,
     image,videoUrl,status,featured,listingRef,category,source,externalId,
     createdAt,createdBy,updatedAt,soldBy,soldAt,rentedBy,rentedAt`;
-  const sql = `SELECT ${cols} FROM properties${conditions.length ? ' WHERE ' + conditions.join(' AND ') : ''}`;
-  const rows = db.prepare(sql).all(...params);
-  res.json(rows.map(r => ({ ...rowToProperty({ ...r, images: '[]' }), images: [] })).map(toPropertyResponse));
+  const rows = db.prepare(`SELECT ${cols} FROM properties${where} ORDER BY createdAt DESC LIMIT ? OFFSET ?`)
+    .all(...params, limitNum, offset);
+
+  res.json({
+    properties: rows.map(r => ({ ...rowToProperty({ ...r, images: '[]' }), images: [] })).map(toPropertyResponse),
+    total,
+    page: pageNum,
+    limit: limitNum,
+    totalPages: Math.ceil(total / limitNum),
+  });
 });
 
 // ── GET /cities ───────────────────────────────────────────────────────────────

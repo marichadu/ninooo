@@ -75,6 +75,8 @@ export const propertyService = {
     if (filters.minPrice) params.append('minPrice', filters.minPrice);
     if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
     if (filters.status) params.append('status', filters.status);
+    if (filters.page) params.append('page', filters.page);
+    if (filters.limit) params.append('limit', filters.limit);
 
     const response = await api.get(`/properties?${params.toString()}`);
     return response.data;

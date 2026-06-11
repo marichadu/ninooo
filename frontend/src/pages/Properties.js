@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { propertyService, authService } from '../services/api';
@@ -48,6 +48,10 @@ function Properties() {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState(() => parseFiltersFromSearch(location.search));
   const [keywordInput, setKeywordInput] = useState(() => parseFiltersFromSearch(location.search).keyword);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
+  const prevFilters = useRef(filters);
 
   const resolveLocaleValue = (valueSet, geKey, enKey, ruKey) => {
     if (i18n.language === 'ka') return valueSet[geKey] || valueSet[enKey] || valueSet[ruKey] || '';
@@ -74,18 +78,25 @@ function Properties() {
   }, [keywordInput]);
 
   useEffect(() => {
+    if (prevFilters.current !== filters) {
+      prevFilters.current = filters;
+      setPage(1);
+      return;
+    }
     (async () => {
       try {
         setLoading(true);
-        const data = await propertyService.getAll(filters);
-        setProperties(data);
+        const result = await propertyService.getAll({ ...filters, page, limit: 20 });
+        setProperties(result.properties || []);
+        setTotal(result.total || 0);
+        setTotalPages(result.totalPages || 1);
       } catch (error) {
         console.error('Error fetching properties:', error);
       } finally {
         setLoading(false);
       }
     })();
-  }, [filters]);
+  }, [filters, page]);
 
   useEffect(() => {
     if (!filters.city) { setZones([]); return; }
@@ -268,6 +279,7 @@ function Properties() {
                     : t('common.all')}
                   {filters.type && <span className="results-pill">{filters.type === 'rent' ? t('properties.rent') : t('properties.sale')}</span>}
                 </h2>
+                {!loading && total > 0 && <span className="results-count">{total}</span>}
               </div>
 
               {loading && <div className="loading">{t('common.loading')}</div>}
@@ -326,6 +338,32 @@ function Properties() {
                       </div>
                     </article>
                   ))}
+                </div>
+              )}
+
+              {totalPages > 1 && (
+                <div className="properties-pagination">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1 || loading}
+                  >‹</button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                    .reduce((acc, p, i, arr) => {
+                      if (i > 0 && p - arr[i - 1] > 1) acc.push('…');
+                      acc.push(p);
+                      return acc;
+                    }, [])
+                    .map((p, i) => p === '…'
+                      ? <span key={`e${i}`} className="pagination-ellipsis">…</span>
+                      : <button key={p} className={`btn ${p === page ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setPage(p)} disabled={loading}>{p}</button>
+                    )}
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages || loading}
+                  >›</button>
                 </div>
               )}
             </main>
