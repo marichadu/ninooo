@@ -197,7 +197,7 @@ function PropertyForm({
           />
         </div>
         <div className="form-group">
-          <label>Price per m²</label>
+          <label>{t('form.pricePerSqm')}</label>
           <input
             type="number"
             min="0"
@@ -209,7 +209,7 @@ function PropertyForm({
           />
         </div>
         <div className="form-group">
-          <label>Currency</label>
+          <label>{t('form.currency')}</label>
           <select name="currency" value={formData.currency} onChange={onInputChange}>
             <option value="USD">USD ($)</option>
             <option value="GEL">GEL (₾)</option>
@@ -285,7 +285,7 @@ function PropertyForm({
       </div>
 
       <div className="form-group form-group-full pform-video">
-        <label>Video URLs</label>
+        <label>{t('form.videoUrls')}</label>
         {(videoUrls || []).map((url, i) => (
           <div key={i} className="pform-video-row">
             <input
