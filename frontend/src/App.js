@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import './i18n/config';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
-import Properties from './pages/Properties';
-import PropertyDetail from './pages/PropertyDetail';
-import Login from './pages/Login';
-import AdminPanel from './pages/AdminPanel';
-import About from './pages/About';
-import Contact from './pages/Contact';
 import './styles/App.css';
 import { authService } from './services/api';
+
+const Properties    = lazy(() => import('./pages/Properties'));
+const PropertyDetail = lazy(() => import('./pages/PropertyDetail'));
+const Login         = lazy(() => import('./pages/Login'));
+const AdminPanel    = lazy(() => import('./pages/AdminPanel'));
+const About         = lazy(() => import('./pages/About'));
+const Contact       = lazy(() => import('./pages/Contact'));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -56,31 +57,33 @@ function App() {
         onLogout={handleLogout}
         onLanguageChange={changeLanguage}
       />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/properties" element={<Properties />} />
-        <Route path="/properties/:id" element={<PropertyDetail />} />
-        <Route
-          path="/login"
-          element={
-            isAuthenticated ? <Navigate to={user?.role === 'admin' || user?.role === 'employee' ? '/dashboard' : '/'} /> : (
-              <Login onLogin={handleLogin} />
-            )
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            isAuthenticated && (user?.role === 'admin' || user?.role === 'employee') ? (
-              <AdminPanel user={user} />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
+      <Suspense fallback={<div style={{ minHeight: '60vh' }} />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/properties" element={<Properties />} />
+          <Route path="/properties/:id" element={<PropertyDetail />} />
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? <Navigate to={user?.role === 'admin' || user?.role === 'employee' ? '/dashboard' : '/'} /> : (
+                <Login onLogin={handleLogin} />
+              )
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              isAuthenticated && (user?.role === 'admin' || user?.role === 'employee') ? (
+                <AdminPanel user={user} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
+      </Suspense>
       <Footer />
     </Router>
   );

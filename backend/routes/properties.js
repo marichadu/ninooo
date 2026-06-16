@@ -128,6 +128,7 @@ router.get('/', (req, res) => {
 
 // ── GET /cities ───────────────────────────────────────────────────────────────
 router.get('/cities', (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=300');
   const rows = db.prepare(
     'SELECT city, cityEn, cityRu FROM properties GROUP BY cityEn ORDER BY cityEn ASC, city ASC'
   ).all();
@@ -136,6 +137,7 @@ router.get('/cities', (req, res) => {
 
 // ── GET /zones/:city ──────────────────────────────────────────────────────────
 router.get('/zones/:city', (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=300');
   const { city } = req.params;
   const seen = new Set();
   const zones = [];
@@ -152,6 +154,7 @@ router.get('/zones/:city', (req, res) => {
 
 // ── GET /featured ─────────────────────────────────────────────────────────────
 router.get('/featured', (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=60');
   const cols = `id,title,titleEn,titleRu,city,cityEn,cityRu,zone,zoneEn,zoneRu,
     type,sqMeters,bedrooms,bathrooms,floor,price,pricePerSqm,priceNote,currency,
     image,videoUrl,status,featured,listingRef,category,createdAt`;
