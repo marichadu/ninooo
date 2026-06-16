@@ -4,6 +4,12 @@ import { Link } from 'react-router-dom';
 import { safeImageSrc } from '../../utils/propertyDisplay';
 
 const STATUS_OPTIONS = ['active', 'sold', 'rented', 'disabled'];
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+};
 const STATUS_I18N_KEY = { active: 'admin.statusActive', sold: 'admin.statusSold', rented: 'admin.statusRented', disabled: 'admin.statusDisabled' };
 const PAGE_SIZE = 10;
 
@@ -102,6 +108,7 @@ function ListingsTable({
                   <option value="disabled">{t('admin.statusDisabled')}</option>
                 </select>
               </th>
+              <th style={{width: 90, fontSize: '0.75rem', color: '#888'}}>თარიღი</th>
               <th>
                 <button type="button" className="col-filter-clear" onClick={onClearFilters} title="Clear filters">✕</button>
               </th>
@@ -109,10 +116,10 @@ function ListingsTable({
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={10} className="table-state">{t('common.loading')}</td></tr>
+              <tr><td colSpan={11} className="table-state">{t('common.loading')}</td></tr>
             )}
             {!loading && listings.length === 0 && (
-              <tr><td colSpan={10} className="table-state">{t('properties.noResults')}</td></tr>
+              <tr><td colSpan={11} className="table-state">{t('properties.noResults')}</td></tr>
             )}
             {!loading && paged.map(property => (
               <tr key={property.id}>
@@ -153,6 +160,7 @@ function ListingsTable({
                     ))}
                   </select>
                 </td>
+                <td className="listing-date">{formatDate(property.createdAt)}</td>
                 <td className="actions">
                   <button
                     className={`btn btn-small ${property.featured ? 'btn-featured-on' : 'btn-featured-off'}`}

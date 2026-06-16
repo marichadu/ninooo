@@ -128,15 +128,10 @@ router.get('/', (req, res) => {
 
 // ── GET /cities ───────────────────────────────────────────────────────────────
 router.get('/cities', (req, res) => {
-  const seen = new Set();
-  const cities = [];
-  db.prepare('SELECT city, cityEn, cityRu FROM properties ORDER BY cityEn ASC, city ASC').all().forEach(row => {
-    if (!seen.has(row.cityEn)) {
-      seen.add(row.cityEn);
-      cities.push({ ge: row.city, en: row.cityEn, ru: row.cityRu });
-    }
-  });
-  res.json(cities);
+  const rows = db.prepare(
+    'SELECT city, cityEn, cityRu FROM properties GROUP BY cityEn ORDER BY cityEn ASC, city ASC'
+  ).all();
+  res.json(rows.map(r => ({ ge: r.city, en: r.cityEn, ru: r.cityRu })));
 });
 
 // ── GET /zones/:city ──────────────────────────────────────────────────────────
@@ -157,8 +152,11 @@ router.get('/zones/:city', (req, res) => {
 
 // ── GET /featured ─────────────────────────────────────────────────────────────
 router.get('/featured', (req, res) => {
-  const rows = db.prepare('SELECT * FROM properties WHERE featured=1 AND status=\'active\' ORDER BY createdAt DESC').all();
-  res.json(rows.map(rowToProperty).map(toPropertyResponse));
+  const cols = `id,title,titleEn,titleRu,city,cityEn,cityRu,zone,zoneEn,zoneRu,
+    type,sqMeters,bedrooms,bathrooms,floor,price,pricePerSqm,priceNote,currency,
+    image,videoUrl,status,featured,listingRef,category,createdAt`;
+  const rows = db.prepare(`SELECT ${cols} FROM properties WHERE featured=1 AND status='active' ORDER BY createdAt DESC`).all();
+  res.json(rows.map(r => toPropertyResponse(rowToProperty({ ...r, images: '[]' }))));
 });
 
 // ── GET /:id ──────────────────────────────────────────────────────────────────

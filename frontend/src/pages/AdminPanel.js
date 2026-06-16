@@ -216,18 +216,18 @@ function AdminPanel({ user }) {
       };
 
       if (editingId) {
-        await propertyService.update(editingId, payload);
+        const updated = await propertyService.update(editingId, payload);
+        setProperties(prev => prev.map(p => p.id === editingId ? { ...p, ...updated } : p));
         setMessage(t('message.updateSuccess'));
       } else {
-        await propertyService.create(payload);
+        const created = await propertyService.create(payload);
+        setProperties(prev => [created, ...prev]);
         setMessage(t('message.createSuccess'));
       }
       setShowForm(false);
       setEditingId(null);
       setFormError('');
       resetForm();
-      const result = await propertyService.getAll({ status: 'all', limit: 500 });
-      setProperties(result.properties || []);
     } catch (error) {
       const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
       setMessage(serverMsg || t('message.error'));
@@ -287,15 +287,11 @@ function AdminPanel({ user }) {
   };
 
   const handleDelete = async (id) => {
-    if (!globalThis.confirm(t('message.confirmDelete'))) {
-      return;
-    }
-
+    if (!globalThis.confirm(t('message.confirmDelete'))) return;
     try {
       await propertyService.delete(id);
+      setProperties(prev => prev.filter(p => p.id !== id));
       setMessage(t('message.deleteSuccess'));
-      const result = await propertyService.getAll({ status: 'all', limit: 500 });
-      setProperties(result.properties || []);
     } catch (error) {
       setMessage(error?.response?.data?.message || error?.message || t('message.error'));
     }
@@ -404,8 +400,7 @@ function AdminPanel({ user }) {
   const handleMarkStatus = async (id, status) => {
     try {
       await propertyService.update(id, { status });
-      const result = await propertyService.getAll({ status: 'all', limit: 500 });
-      setProperties(result.properties || []);
+      setProperties(prev => prev.map(p => p.id === id ? { ...p, status } : p));
     } catch (error) {
       setMessage(error?.response?.data?.message || error?.message || t('message.error'));
     }
@@ -414,8 +409,7 @@ function AdminPanel({ user }) {
   const handleToggleFeatured = async (id, featured) => {
     try {
       await propertyService.update(id, { featured });
-      const result = await propertyService.getAll({ status: 'all', limit: 500 });
-      setProperties(result.properties || []);
+      setProperties(prev => prev.map(p => p.id === id ? { ...p, featured: featured ? 1 : 0 } : p));
     } catch (error) {
       setMessage(error?.response?.data?.message || error?.message || t('message.error'));
     }
