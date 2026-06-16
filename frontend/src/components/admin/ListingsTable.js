@@ -108,7 +108,7 @@ function ListingsTable({
                   <option value="disabled">{t('admin.statusDisabled')}</option>
                 </select>
               </th>
-              <th style={{width: 90, fontSize: '0.75rem', color: '#888'}}>თარიღი</th>
+              <th style={{width: 90, fontSize: '0.75rem', color: '#888'}}>{t('admin.addedOn')}</th>
               <th>
                 <button type="button" className="col-filter-clear" onClick={onClearFilters} title="Clear filters">✕</button>
               </th>

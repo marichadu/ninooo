@@ -84,6 +84,7 @@ const resources = {
       'admin.sortPriceDesc': 'Price ↓',
       'admin.sortByStatus': 'By status',
       'admin.searchById': 'Search by ID...',
+      'admin.addedOn': 'Added on',
 
       // Forms
       'form.title': 'Title',
@@ -364,6 +365,7 @@ const resources = {
       'admin.sortPriceDesc': 'ფასი ↓',
       'admin.sortByStatus': 'სტატუსით',
       'admin.searchById': 'ID-ით ძიება...',
+      'admin.addedOn': 'დამატებულია',
 
       // Forms
       'form.title': 'სათაური',
@@ -644,6 +646,7 @@ const resources = {
       'admin.sortPriceDesc': 'Цена ↓',
       'admin.sortByStatus': 'По статусу',
       'admin.searchById': 'Поиск по ID...',
+      'admin.addedOn': 'Добавлено',
 
       // Forms
       'form.title': 'Название',
