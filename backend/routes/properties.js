@@ -167,7 +167,7 @@ router.get('/:id', (req, res) => {
 });
 
 // ── POST /  (create) ──────────────────────────────────────────────────────────
-router.post('/', authMiddleware, employeeOrAdmin, (req, res) => {
+router.post('/', authMiddleware, employeeOrAdmin, async (req, res) => {
   try {
     const {
       title, titleEn, titleRu,
@@ -189,7 +189,8 @@ router.post('/', authMiddleware, employeeOrAdmin, (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const imagesArr = normalizeImages({ image, images });
+    const rawImages = normalizeImages({ image, images });
+    const imagesArr = await localizeImages(rawImages);
     const p = {
       id:            uuidv4(),
       title,         titleEn,       titleRu,
@@ -211,7 +212,7 @@ router.post('/', authMiddleware, employeeOrAdmin, (req, res) => {
       pricePerSqm:   hasPrivatePrice ? 0 : parsePropertyNumber(pricePerSqm),
       priceNote:     hasPrivatePrice ? priceNote.trim() : '',
       currency:      currency  || 'USD',
-      image:         image || imagesArr[0] || '',
+      image:         imagesArr[0] || image || '',
       images:        JSON.stringify(imagesArr),
       videoUrl:      videoUrl  || '',
       listingRef:    listingRef ? String(listingRef).trim() : '',
@@ -353,7 +354,7 @@ router.post('/import', authMiddleware, employeeOrAdmin, async (req, res) => {
 });
 
 // ── PUT /:id  (update) ────────────────────────────────────────────────────────
-router.put('/:id', authMiddleware, employeeOrAdmin, (req, res) => {
+router.put('/:id', authMiddleware, employeeOrAdmin, async (req, res) => {
   try {
     const row = db.prepare('SELECT * FROM properties WHERE id=?').get(req.params.id);
     if (!row) return res.status(404).json({ message: 'Property not found' });
@@ -367,9 +368,10 @@ router.put('/:id', authMiddleware, employeeOrAdmin, (req, res) => {
 
     const merged = { ...rowToProperty(row), ...sanitized, ...extra, updatedAt: new Date().toISOString() };
 
-    const imagesArr = normalizeImages({ image: merged.image, images: merged.images });
+    const rawImages = normalizeImages({ image: merged.image, images: merged.images });
+    const imagesArr = await localizeImages(rawImages);
     merged.images = JSON.stringify(imagesArr);
-    if (!merged.image && imagesArr.length) merged.image = imagesArr[0];
+    merged.image  = imagesArr[0] || merged.image || '';
 
     db.prepare(`
       UPDATE properties SET
