@@ -11,12 +11,17 @@ import '../styles/AdminPanel.css';
 
 const STATUS_ORDER = { active: 0, rented: 1, sold: 2, disabled: 3 };
 
+// Module-level cache — survives navigation, cleared on page reload
+let _cachedProperties = null;
+let _cacheTime = 0;
+const CACHE_TTL = 60_000; // 60 seconds
+
 function AdminPanel({ user }) {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const editHandledRef = useRef(false);
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [properties, setProperties] = useState(_cachedProperties || []);
+  const [loading, setLoading] = useState(!_cachedProperties);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [photoItems, setPhotoItems] = useState([]);
@@ -52,11 +57,16 @@ function AdminPanel({ user }) {
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
+    const fresh = Date.now() - _cacheTime < CACHE_TTL;
+    if (fresh && _cachedProperties) return; // already showing cached data
     (async () => {
       try {
-        setLoading(true);
+        if (!_cachedProperties) setLoading(true);
         const result = await propertyService.getAll({ status: 'all', limit: 500 });
-        setProperties(result.properties || []);
+        const list = result.properties || [];
+        _cachedProperties = list;
+        _cacheTime = Date.now();
+        setProperties(list);
       } catch (error) {
         console.error('Error fetching admin data:', error);
         setMessage(t('message.error'));
@@ -351,6 +361,11 @@ function AdminPanel({ user }) {
   const [listPage, setListPage] = useState(1);
 
   useEffect(() => { setListPage(1); }, [statusFilter, typeFilter, categoryFilter, cityFilter, zoneFilter, sortOrder, refSearch, titleSearch]);
+
+  // Keep module-level cache in sync with every state update
+  useEffect(() => {
+    if (properties.length > 0) { _cachedProperties = properties; _cacheTime = Date.now(); }
+  }, [properties]);
 
   const filterCities = useMemo(() => {
     const map = new Map();
