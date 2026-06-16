@@ -80,8 +80,10 @@ function Properties() {
   useEffect(() => {
     if (prevFilters.current !== filters) {
       prevFilters.current = filters;
-      setPage(1);
-      return;
+      if (page !== 1) {
+        setPage(1);
+        return;
+      }
     }
     (async () => {
       try {
