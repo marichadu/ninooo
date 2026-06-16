@@ -41,7 +41,7 @@ function buildChangeSummary(original, form, photos) {
   if (wasPrivate !== Boolean(form.isPricePrivate))
     changes.push(form.isPricePrivate ? 'ფასი: პირადად გადართული' : 'ფასი: საჯაროდ გადართული');
 
-  const origCount = Array.isArray(original.images) ? original.images.filter(Boolean).length : (original.image ? 1 : 0);
+  const origCount = original._photoCount ?? 0;
   if (origCount !== photos.length) changes.push(`ფოტოები: ${origCount} → ${photos.length}`);
 
   return changes;
@@ -305,12 +305,11 @@ function AdminPanel({ user }) {
   };
 
   const populateEditForm = (property) => {
-    originalPropertyRef.current = property;
     const existingImages = Array.isArray(property.images) && property.images.length > 0
       ? property.images
       : (property.image ? [property.image] : []);
 
-    setFormData({
+    const initialForm = {
       title: property.title,
       titleEn: property.titleEn,
       titleRu: property.titleRu,
@@ -337,7 +336,11 @@ function AdminPanel({ user }) {
       videoUrls: parseVideoUrls(property.videoUrl),
       listingRef: property.listingRef || '',
       category: property.category || 'residential',
-    });
+      _photoCount: existingImages.length,
+    };
+
+    originalPropertyRef.current = initialForm;
+    setFormData(initialForm);
     setPhotoItems(existingImages.map((src, index) => ({
       id: `${property.id}-${index}`,
       src,
