@@ -36,10 +36,16 @@ function buildChangeSummary(original, form, photos) {
   if (s(original.zone) !== s(form.zone)) changes.push(`უბანი: ${s(original.zone) || '—'} → ${s(form.zone)}`);
   if (original.type !== form.type)       changes.push(`ტიპი: ${original.type} → ${form.type}`);
   if (s(original.currency) !== s(form.currency)) changes.push(`ვალუტა: ${s(original.currency)} → ${s(form.currency)}`);
+  if (s(original.listingRef) !== s(form.listingRef)) changes.push(`REF: ${s(original.listingRef) || '—'} → ${s(form.listingRef) || '—'}`);
+  if (s(original.category) !== s(form.category)) changes.push(`კატეგორია: ${s(original.category)} → ${s(form.category)}`);
 
-  const wasPrivate = Boolean(original.priceNote);
-  if (wasPrivate !== Boolean(form.isPricePrivate))
+  if (Boolean(original.isPricePrivate) !== Boolean(form.isPricePrivate))
     changes.push(form.isPricePrivate ? 'ფასი: პირადად გადართული' : 'ფასი: საჯაროდ გადართული');
+
+  const origVideoUrls = (original.videoUrls || []).filter(u => u && u.trim()).sort();
+  const newVideoUrls  = (form.videoUrls  || []).filter(u => u && u.trim()).sort();
+  if (JSON.stringify(origVideoUrls) !== JSON.stringify(newVideoUrls))
+    changes.push(`ვიდეო: ${origVideoUrls.length} → ${newVideoUrls.length}`);
 
   const origCount = original._photoCount ?? 0;
   if (origCount !== photos.length) changes.push(`ფოტოები: ${origCount} → ${photos.length}`);
@@ -57,6 +63,8 @@ function AdminPanel({ user }) {
   const [searchParams] = useSearchParams();
   const editHandledRef = useRef(false);
   const originalPropertyRef = useRef(null);
+  const formDataRef = useRef(null);
+  const photoItemsRef = useRef([]);
   const [properties, setProperties] = useState(_cachedProperties || []);
   const [loading, setLoading] = useState(!_cachedProperties);
   const [showForm, setShowForm] = useState(false);
@@ -93,6 +101,10 @@ function AdminPanel({ user }) {
   const [message, setMessage] = useState('');
   const [messageDetails, setMessageDetails] = useState([]);
   const [formError, setFormError] = useState('');
+
+  // Keep refs in sync so async handleSubmit always reads latest values
+  formDataRef.current = formData;
+  photoItemsRef.current = photoItems;
 
   const clearMessage = () => { setMessage(''); setMessageDetails([]); };
 
@@ -251,26 +263,28 @@ function AdminPanel({ user }) {
     }
 
     try {
-      const orderedImages = photoItems.map((photo) => photo.src).filter(Boolean);
-      const privatePriceEnabled = Boolean(formData.isPricePrivate);
-      const priceNote = privatePriceEnabled ? (formData.priceNote || t('form.pricePrivateValue')) : '';
+      const currentFormData = formDataRef.current;
+      const currentPhotoItems = photoItemsRef.current;
+      const orderedImages = currentPhotoItems.map((photo) => photo.src).filter(Boolean);
+      const privatePriceEnabled = Boolean(currentFormData.isPricePrivate);
+      const priceNote = privatePriceEnabled ? (currentFormData.priceNote || t('form.pricePrivateValue')) : '';
       const payload = {
-        ...formData,
+        ...currentFormData,
         videoUrls: undefined,
-        price: privatePriceEnabled ? 0 : (formData.price || 0),
-        pricePerSqm: privatePriceEnabled ? 0 : (formData.pricePerSqm || 0),
+        price: privatePriceEnabled ? 0 : (currentFormData.price || 0),
+        pricePerSqm: privatePriceEnabled ? 0 : (currentFormData.pricePerSqm || 0),
         priceNote,
         images: orderedImages,
-        image: orderedImages[0] || formData.image || '',
-        videoUrl: JSON.stringify((formData.videoUrls || ['']).filter(u => u.trim()))
+        image: orderedImages[0] || currentFormData.image || '',
+        videoUrl: JSON.stringify((currentFormData.videoUrls || ['']).filter(u => u.trim()))
       };
 
       if (editingId) {
         const updated = await propertyService.update(editingId, payload);
         setProperties(prev => prev.map(p => p.id === editingId ? { ...p, ...updated } : p));
-        const changes = buildChangeSummary(originalPropertyRef.current, formData, photoItems);
+        const changes = buildChangeSummary(originalPropertyRef.current, currentFormData, currentPhotoItems);
         setMessageDetails(changes);
-        setMessage(changes.length ? t('message.updateSuccess') : t('message.updateSuccess'));
+        setMessage(t('message.updateSuccess'));
       } else {
         const created = await propertyService.create(payload);
         setProperties(prev => [created, ...prev]);
