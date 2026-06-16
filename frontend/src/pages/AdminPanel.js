@@ -11,6 +11,42 @@ import '../styles/AdminPanel.css';
 
 const STATUS_ORDER = { active: 0, rented: 1, sold: 2, disabled: 3 };
 
+function buildChangeSummary(original, form, photos) {
+  if (!original) return [];
+  const changes = [];
+  const n = v => Number(v) || 0;
+  const s = v => String(v || '').trim();
+
+  if (n(original.price) !== n(form.price))             changes.push(`ფასი: $${n(original.price)} → $${n(form.price)}`);
+  if (n(original.pricePerSqm) !== n(form.pricePerSqm)) changes.push(`ფასი მ²: $${n(original.pricePerSqm)} → $${n(form.pricePerSqm)}`);
+  if (n(original.sqMeters) !== n(form.sqMeters))       changes.push(`კვ.მ: ${n(original.sqMeters)} → ${n(form.sqMeters)}`);
+  if (n(original.bedrooms) !== n(form.bedrooms))       changes.push(`საძინებელი: ${n(original.bedrooms)} → ${n(form.bedrooms)}`);
+  if (n(original.bathrooms) !== n(form.bathrooms))     changes.push(`აბაზანა: ${n(original.bathrooms)} → ${n(form.bathrooms)}`);
+  if (n(original.floor) !== n(form.floor))             changes.push(`სართული: ${n(original.floor)} → ${n(form.floor)}`);
+
+  if (s(original.title) !== s(form.title))       changes.push('სათაური 🇬🇪 განახლდა');
+  if (s(original.titleEn) !== s(form.titleEn))   changes.push('სათაური 🇺🇸 განახლდა');
+  if (s(original.titleRu) !== s(form.titleRu))   changes.push('სათაური 🇷🇺 განახლდა');
+
+  if (s(original.description) !== s(form.description))     changes.push('აღწერა 🇬🇪 განახლდა');
+  if (s(original.descriptionEn) !== s(form.descriptionEn)) changes.push('აღწერა 🇺🇸 განახლდა');
+  if (s(original.descriptionRu) !== s(form.descriptionRu)) changes.push('აღწერა 🇷🇺 განახლდა');
+
+  if (s(original.city) !== s(form.city)) changes.push(`ქალაქი: ${s(original.city) || '—'} → ${s(form.city)}`);
+  if (s(original.zone) !== s(form.zone)) changes.push(`უბანი: ${s(original.zone) || '—'} → ${s(form.zone)}`);
+  if (original.type !== form.type)       changes.push(`ტიპი: ${original.type} → ${form.type}`);
+  if (s(original.currency) !== s(form.currency)) changes.push(`ვალუტა: ${s(original.currency)} → ${s(form.currency)}`);
+
+  const wasPrivate = Boolean(original.priceNote);
+  if (wasPrivate !== Boolean(form.isPricePrivate))
+    changes.push(form.isPricePrivate ? 'ფასი: პირადად გადართული' : 'ფასი: საჯაროდ გადართული');
+
+  const origCount = Array.isArray(original.images) ? original.images.filter(Boolean).length : (original.image ? 1 : 0);
+  if (origCount !== photos.length) changes.push(`ფოტოები: ${origCount} → ${photos.length}`);
+
+  return changes;
+}
+
 // Module-level cache — survives navigation, cleared on page reload
 let _cachedProperties = null;
 let _cacheTime = 0;
@@ -20,6 +56,7 @@ function AdminPanel({ user }) {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const editHandledRef = useRef(false);
+  const originalPropertyRef = useRef(null);
   const [properties, setProperties] = useState(_cachedProperties || []);
   const [loading, setLoading] = useState(!_cachedProperties);
   const [showForm, setShowForm] = useState(false);
@@ -54,7 +91,10 @@ function AdminPanel({ user }) {
     category: 'residential',
   });
   const [message, setMessage] = useState('');
+  const [messageDetails, setMessageDetails] = useState([]);
   const [formError, setFormError] = useState('');
+
+  const clearMessage = () => { setMessage(''); setMessageDetails([]); };
 
   useEffect(() => {
     const fresh = Date.now() - _cacheTime < CACHE_TTL;
@@ -228,10 +268,13 @@ function AdminPanel({ user }) {
       if (editingId) {
         const updated = await propertyService.update(editingId, payload);
         setProperties(prev => prev.map(p => p.id === editingId ? { ...p, ...updated } : p));
-        setMessage(t('message.updateSuccess'));
+        const changes = buildChangeSummary(originalPropertyRef.current, formData, photoItems);
+        setMessageDetails(changes);
+        setMessage(changes.length ? t('message.updateSuccess') : t('message.updateSuccess'));
       } else {
         const created = await propertyService.create(payload);
         setProperties(prev => [created, ...prev]);
+        setMessageDetails([`ID: ${created.listingRef || created.id?.slice(0,8)}`, `${created.type === 'rent' ? 'ქირა' : 'ყიდვა'} · ${created.sqMeters} მ²`]);
         setMessage(t('message.createSuccess'));
       }
       setShowForm(false);
@@ -239,13 +282,30 @@ function AdminPanel({ user }) {
       setFormError('');
       resetForm();
     } catch (error) {
+      const status = error?.response?.status;
       const serverMsg = error?.response?.data?.message || error?.response?.data?.error;
-      setMessage(serverMsg || t('message.error'));
+      let errorMsg;
+      if (!error.response) {
+        errorMsg = error.code === 'ECONNABORTED'
+          ? 'Request timed out — server may be starting up, try again'
+          : 'Connection error — check your internet connection';
+      } else if (status === 400) {
+        errorMsg = serverMsg || 'Invalid data — check all required fields';
+      } else if (status === 401 || status === 403) {
+        errorMsg = 'Session expired — please log in again';
+      } else if (status === 413) {
+        errorMsg = 'Images too large — try reducing file sizes';
+      } else {
+        errorMsg = serverMsg ? `Server error: ${serverMsg}` : 'Server error — try again in a moment';
+      }
+      setMessage(errorMsg);
+      setMessageDetails([]);
       console.error('Error saving property:', error);
     }
   };
 
   const populateEditForm = (property) => {
+    originalPropertyRef.current = property;
     const existingImages = Array.isArray(property.images) && property.images.length > 0
       ? property.images
       : (property.image ? [property.image] : []);
@@ -454,8 +514,13 @@ function AdminPanel({ user }) {
 
         {message && (
           <div className={`message ${/success|успешно|წარმატებ|updated/i.test(message) ? 'success' : 'error'}`}>
-            {message}
-            <button onClick={() => setMessage('')} className="close-msg">×</button>
+            <div>{message}</div>
+            {messageDetails.length > 0 && (
+              <ul className="message-details">
+                {messageDetails.map((d, i) => <li key={i}>{d}</li>)}
+              </ul>
+            )}
+            <button onClick={clearMessage} className="close-msg">×</button>
           </div>
         )}
 

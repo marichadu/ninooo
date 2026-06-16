@@ -65,6 +65,14 @@
   border-left: 4px solid var(--danger);
 }
 
+.message-details {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+.message-details li { margin: 2px 0; }
+
 .close-msg {
   background: none;
   border: none;
